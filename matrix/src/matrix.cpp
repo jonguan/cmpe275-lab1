@@ -15,6 +15,7 @@ void checkSol(int const num_rows, int const num_cols, float const* const a, floa
  */
 void add(float* const a, float* const b, float* const c, int const num_rows, int const num_cols)
 {
+     #pragma omp parallel for collapse(2)
     for(int col = 0; col < num_cols; col++) {
        for(int row = 0; row < num_rows; row++) {
            int i = col + row * num_cols;
