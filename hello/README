@@ -1,0 +1,36 @@
+To compile:
+
+   [prompt]: g++ -fopenmp [cpp_fn] -o [exe_name]
+
+To run:
+
+   [prompt]: OMP_NUM_THREADS=4 ./[exe_name]
+
+   Use can use time to obtain wallclock (real) timings numbers
+
+   [prompt]: time OMP_NUM_THREADS=4 ./[exe_name]
+
+
+
+Examples (using bash):
+
+   Compile and run: 
+
+   [prompt]: g++ -fopenmp hello-mp.cpp -o hello-mp
+   [prompt]: OMP_NUM_THREADS=4 ./hello-mp
+
+
+   Timing your run: 
+
+   [prompt]: time ./hello-mp
+   pi = 3.141593
+
+   real	0m0.048s
+   user	0m0.043s
+   sys	0m0.004s
+   [prompt]:
+
+    
+
+
+
