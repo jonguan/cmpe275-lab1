@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-
+#include <omp.h>
 
 void createData(int const num_rows, int const num_cols, float* const a, float* const b,
                       float* const c, float* const ref);
@@ -57,6 +57,7 @@ void createData(int const num_rows, int const num_cols, float* const a, float* c
 
     srand((unsigned)time(NULL));
 
+    #pragma omp parallel for collapse(2)
     for(int row = 0; row < num_rows; row++) {
        for(int col = 0; col < num_cols; col++) {
            int i = col + row * num_cols;
