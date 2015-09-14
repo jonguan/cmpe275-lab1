@@ -74,14 +74,20 @@ void checkSol(int const num_rows, int const num_cols, float const* const a, floa
 {
     int const N = num_rows * num_cols;
 
-    int i;
     int different = 0;
 
-    for(int i = 0; i < N; i++) {
-        different = (a[i] != b[i]);
-        if(different) break;
+    #pragma omp parallel
+    {
+      int this_thread = omp_get_thread_num(), num_threads = omp_get_num_threads();
+      size_t beginpos = (this_thread+0) * N / num_threads;
+      size_t endpos   = (this_thread+1) * N / num_threads;
+      // watch out for overflow in that multiplication.
+      #pragma omp for reduction(|:different)
+      for(size_t i=beginpos; i < endpos; i++) {
+        different = (a[i] != b[i]); 
+      }
     }
-
+    
     if(different)
         printf("Arrays do not match.\n");
     else
