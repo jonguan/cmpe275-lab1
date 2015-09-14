@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
 #include <time.h>
 #include <omp.h>
 
@@ -76,17 +77,31 @@ void checkSol(int const num_rows, int const num_cols, float const* const a, floa
 
     int different = 0;
 
-    #pragma omp parallel
+    int beginpos = 0, n_per_loop = 2048 * 2048 / omp_get_max_threads();
+    while(beginpos < N && !different)
     {
-      int this_thread = omp_get_thread_num(), num_threads = omp_get_num_threads();
-      size_t beginpos = (this_thread+0) * N / num_threads;
-      size_t endpos   = (this_thread+1) * N / num_threads;
-      // watch out for overflow in that multiplication.
-      #pragma omp for reduction(|:different)
-      for(size_t i=beginpos; i < endpos; i++) {
-        different = (a[i] != b[i]); 
-      }
+      int endpos = std::min(N, beginpos + n_per_loop);
+      #pragma omp parallel for reduction(|:different)
+      for(int i = beginpos; i < endpos; i++)
+        if(a[i] != b[i]) 
+        {
+          different = 1;
+        }
+      beginpos = endpos;
     }
+
+
+    // #pragma omp parallel
+    // {
+    //   int this_thread = omp_get_thread_num(), num_threads = omp_get_num_threads();
+    //   size_t beginpos = (this_thread+0) * N / num_threads;
+    //   size_t endpos   = (this_thread+1) * N / num_threads;
+    //   // watch out for overflow in that multiplication.
+    //   #pragma omp for reduction(|:different)
+    //   for(size_t i=beginpos; i < endpos; i++) {
+    //     different = (a[i] != b[i]); 
+    //   }
+    // }
     
     if(different)
         printf("Arrays do not match.\n");
